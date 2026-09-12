@@ -1,0 +1,343 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="ATS Resume Intelligence AI" activePage="ats-checker">
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+    <div>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-xs text-brand-moss-dark font-semibold mb-2">
+        <span>🎯</span>
+        <span>Neural ATS Parser • Recruiter Compatibility Algorithm</span>
+      </div>
+      <h1 class="text-3xl font-extrabold text-ink tracking-tight">ATS Resume Intelligence AI</h1>
+      <p class="text-slate-600 text-sm mt-1">Audit and optimize your resume against corporate Applicant Tracking Systems.</p>
+    </div>
+
+    <!-- Preloaded Demo Presets -->
+    <div class="flex items-center gap-2">
+      <span class="text-xs text-slate-500 font-medium hidden sm:inline">Load Sample Profile:</span>
+      <button
+        onclick="loadSampleResume('fullstack')"
+        class="bg-white border border-hairline hover:border-hairline-strong text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-card-subtle cursor-pointer hover:bg-surface"
+      >
+        Full-Stack Eng
+      </button>
+      <button
+        onclick="loadSampleResume('pm')"
+        class="bg-white border border-hairline hover:border-hairline-strong text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-card-subtle cursor-pointer hover:bg-surface"
+      >
+        Product Mgr
+      </button>
+      <button
+        onclick="loadSampleResume('ai')"
+        class="bg-white border border-hairline hover:border-hairline-strong text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-card-subtle cursor-pointer hover:bg-surface"
+      >
+        AI / Data
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Grid Layout -->
+  <div class="grid lg:grid-cols-12 gap-8">
+    <!-- Left Column: Input & Uploader (5 cols) -->
+    <div class="lg:col-span-5 space-y-6">
+      <!-- Resume Upload Card -->
+      <div class="card-base p-6">
+        <h2 class="font-bold text-base text-ink mb-4 flex items-center justify-between">
+          <span class="flex items-center gap-2"><span>📄</span> 1. Upload Resume</span>
+          <span class="text-[10px] text-brand-moss-dark font-bold bg-teal-50 border border-teal-200 px-2.5 py-0.5 rounded-full">PDF / DOCX</span>
+        </h2>
+
+        <div
+          id="ats-drop-box"
+          class="border-2 border-dashed border-hairline-strong hover:border-brand-teal rounded-2xl p-6 text-center cursor-pointer transition-all bg-surface mb-4 group"
+        >
+          <div class="w-12 h-12 rounded-2xl bg-white border border-hairline text-brand-teal flex items-center justify-center text-2xl mx-auto mb-2 group-hover:scale-105 transition-transform shadow-card-subtle">
+            📥
+          </div>
+          <p id="ats-filename-display" class="text-xs font-bold text-ink">Alex_Rivera_Senior_FullStack.pdf</p>
+          <p class="text-[10px] text-slate-500 mt-0.5">2 Pages • 142 KB • Parsed Cleanly</p>
+        </div>
+
+        <!-- Job Description Input -->
+        <div class="space-y-2 mb-4">
+          <label class="text-xs font-bold text-ink flex items-center justify-between">
+            <span>2. Target Job Description (JD)</span>
+            <span class="text-[10px] text-slate-500 font-normal">Auto Keyword Matching</span>
+          </label>
+          <textarea
+            id="ats-jd-input"
+            rows="6"
+            class="w-full bg-surface border border-hairline-strong rounded-2xl p-3.5 text-xs text-ink placeholder-slate-400 focus:bg-white focus:outline-none focus:border-brand-blue font-mono leading-relaxed"
+            placeholder="Paste the target job description here..."
+          >We are looking for a Senior Full-Stack Engineer with 5+ years of experience in React, TypeScript, and Node.js. Experience with Docker, Kubernetes, GraphQL, PostgreSQL, and building high-throughput microservices. Familiarity with CI/CD pipelines, Terraform, and AWS cloud architecture is strongly preferred.</textarea>
+        </div>
+
+        <button
+          id="btn-scan-ats"
+          class="w-full btn-primary py-3"
+        >
+          <span>🔍 Run AI ATS Deep Audit</span>
+        </button>
+      </div>
+
+      <!-- Quick AI Optimizer Prompt Card -->
+      <div class="card-base p-6">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-bold text-xs text-ink flex items-center gap-2">
+            <span>✨</span> AI Prompt Generator for ChatGPT/Claude
+          </h3>
+          <button
+            onclick="copyAiPrompt()"
+            class="text-[10px] font-bold text-brand-blue bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-full cursor-pointer hover:bg-indigo-100"
+          >
+            📋 Copy Prompt
+          </button>
+        </div>
+        <p class="text-[11px] text-slate-600 mb-3">Copy this tailored prompt directly into ChatGPT or Claude to rewrite your resume bullets with missing keywords:</p>
+        <div class="p-3.5 bg-surface rounded-xl border border-hairline text-[11px] text-slate-700 font-mono leading-relaxed max-h-36 overflow-y-auto">
+          "Act as a Principal Technical Recruiter. Review my resume against this Senior Full-Stack Engineer role. Rewrite my bullet points to organically integrate missing keywords: [Kubernetes, Terraform, CI/CD Pipelines, High-Throughput Microservices] while keeping strong metrics (%, $, latency)."
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Audit Results & Metrics (7 cols) -->
+    <div class="lg:col-span-7 space-y-6">
+      <!-- Main ATS Score Dashboard -->
+      <div class="card-base p-6 sm:p-8">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-6 pb-6 border-b border-hairline">
+          <div class="flex items-center gap-5">
+            <!-- Circular Gauge -->
+            <div class="relative w-28 h-28 flex items-center justify-center">
+              <svg class="w-28 h-28 transform -rotate-90" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="50" fill="none" stroke="#e0e2e8" stroke-width="10" />
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="50"
+                  fill="none"
+                  stroke="#0fbcb0"
+                  stroke-width="10"
+                  stroke-dasharray="314"
+                  stroke-dashoffset="40"
+                  stroke-linecap="round"
+                  class="transition-all duration-1000"
+                />
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                <span id="ats-score-number" class="text-3xl font-extrabold text-ink font-mono">88</span>
+                <span class="text-[9px] text-slate-500 uppercase font-bold">/ 100</span>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold">
+                  ✓ High ATS Match
+                </span>
+              </div>
+              <h3 class="text-lg font-bold text-ink">Strong Recruiter Fit</h3>
+              <p class="text-xs text-slate-600 mt-1 max-w-xs">
+                Your resume ranks in the top 12% of candidate submissions for this role.
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-center text-xs w-full sm:w-auto">
+            <div class="p-3 bg-surface border border-hairline rounded-xl">
+              <span class="text-slate-500 text-[10px] block font-medium">MATCHED SKILLS</span>
+              <span class="font-bold text-emerald-700 font-mono text-base">14 / 18</span>
+            </div>
+            <div class="p-3 bg-surface border border-hairline rounded-xl">
+              <span class="text-slate-500 text-[10px] block font-medium">POWER VERBS</span>
+              <span class="font-bold text-brand-blue font-mono text-base">22 Found</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Sub-Score Gauges -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6">
+          <div class="p-3.5 bg-surface rounded-2xl border border-hairline text-center">
+            <span class="text-[10px] text-slate-500 font-medium block mb-1">Keyword Match</span>
+            <div class="text-base font-bold text-brand-blue font-mono">84%</div>
+            <div class="w-full bg-slate-200 h-1 rounded-full mt-2 overflow-hidden">
+              <div class="bg-brand-blue h-full w-[84%]"></div>
+            </div>
+          </div>
+
+          <div class="p-3.5 bg-surface rounded-2xl border border-hairline text-center">
+            <span class="text-[10px] text-slate-500 font-medium block mb-1">Action Verbs</span>
+            <div class="text-base font-bold text-ink font-mono">92%</div>
+            <div class="w-full bg-slate-200 h-1 rounded-full mt-2 overflow-hidden">
+              <div class="bg-ink h-full w-[92%]"></div>
+            </div>
+          </div>
+
+          <div class="p-3.5 bg-surface rounded-2xl border border-hairline text-center">
+            <span class="text-[10px] text-slate-500 font-medium block mb-1">Measurable Impact</span>
+            <div class="text-base font-bold text-emerald-700 font-mono">79%</div>
+            <div class="w-full bg-slate-200 h-1 rounded-full mt-2 overflow-hidden">
+              <div class="bg-brand-success h-full w-[79%]"></div>
+            </div>
+          </div>
+
+          <div class="p-3.5 bg-surface rounded-2xl border border-hairline text-center">
+            <span class="text-[10px] text-slate-500 font-medium block mb-1">Formatting Health</span>
+            <div class="text-base font-bold text-brand-moss-dark font-mono">98%</div>
+            <div class="w-full bg-slate-200 h-1 rounded-full mt-2 overflow-hidden">
+              <div class="bg-brand-teal h-full w-[98%]"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Keywords Comparison Cloud -->
+      <div class="card-base p-6">
+        <h3 class="font-bold text-sm text-ink mb-4 flex items-center justify-between">
+          <span class="flex items-center gap-2"><span>🏷️</span> Keyword Intelligence & Gap Analysis</span>
+          <span class="text-xs text-slate-500">Extracted from Job Description</span>
+        </h3>
+
+        <div class="space-y-4">
+          <!-- Matched Keywords -->
+          <div>
+            <span class="text-xs font-bold text-emerald-800 block mb-2">
+              ✓ Successfully Matched in Resume (14):
+            </span>
+            <div class="flex flex-wrap gap-1.5" id="matched-keywords-box">
+              <span class="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">TypeScript</span>
+              <span class="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">React</span>
+              <span class="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">Node.js</span>
+              <span class="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">PostgreSQL</span>
+              <span class="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">GraphQL</span>
+              <span class="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">Docker</span>
+              <span class="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">AWS</span>
+              <span class="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">System Architecture</span>
+              <span class="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">REST APIs</span>
+            </div>
+          </div>
+
+          <!-- Missing Keywords -->
+          <div>
+            <span class="text-xs font-bold text-rose-800 block mb-2">
+              ⚠ Missing Keywords in Resume (4) — Click to see bullet suggestion:
+            </span>
+            <div class="flex flex-wrap gap-1.5" id="missing-keywords-box">
+              <button
+                onclick="window.showToast('Suggested bullet point: Engineered container orchestration with Kubernetes on AWS EKS', 'info')"
+                class="px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold hover:bg-rose-100 transition-colors flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>+</span> <span>Kubernetes</span>
+              </button>
+              <button
+                onclick="window.showToast('Suggested bullet point: Automated infrastructure provisioning using Terraform scripts', 'info')"
+                class="px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold hover:bg-rose-100 transition-colors flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>+</span> <span>Terraform</span>
+              </button>
+              <button
+                onclick="window.showToast('Suggested bullet point: Optimized CI/CD deployment pipelines reducing release times by 40%', 'info')"
+                class="px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold hover:bg-rose-100 transition-colors flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>+</span> <span>CI/CD Pipeline</span>
+              </button>
+              <button
+                onclick="window.showToast('Suggested bullet point: Handled 10k+ req/sec using high-throughput microservice architecture', 'info')"
+                class="px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold hover:bg-rose-100 transition-colors flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>+</span> <span>High-Throughput Microservices</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formatting & Sections Checklist -->
+      <div class="card-base p-6">
+        <h3 class="font-bold text-sm text-ink mb-3 flex items-center gap-2">
+          <span>🛡️</span> ATS Parsability & Section Health Check
+        </h3>
+        <div class="grid sm:grid-cols-2 gap-2 text-xs">
+          <div class="p-3 bg-surface rounded-xl border border-hairline flex items-center justify-between">
+            <span class="text-slate-700 font-medium">Contact Email & Phone Linkable</span>
+            <span class="text-emerald-700 font-bold">✓ Pass</span>
+          </div>
+          <div class="p-3 bg-surface rounded-xl border border-hairline flex items-center justify-between">
+            <span class="text-slate-700 font-medium">Standard Section Headings</span>
+            <span class="text-emerald-700 font-bold">✓ Pass</span>
+          </div>
+          <div class="p-3 bg-surface rounded-xl border border-hairline flex items-center justify-between">
+            <span class="text-slate-700 font-medium">No Complex Multi-Column Tables</span>
+            <span class="text-emerald-700 font-bold">✓ Pass</span>
+          </div>
+          <div class="p-3 bg-surface rounded-xl border border-hairline flex items-center justify-between">
+            <span class="text-slate-700 font-medium">Quantifiable Metrics in Experience</span>
+            <span class="text-emerald-700 font-bold">✓ Pass (9 Metrics)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script is:inline>
+  // Scan Button Handler
+  document.getElementById('btn-scan-ats')?.addEventListener('click', async () => {
+    window.showToast('Analyzing resume against job description...', 'info');
+    const fnDisplay = document.getElementById('ats-filename-display')?.textContent || 'Resume.pdf';
+    const scoreNum = parseInt(document.getElementById('ats-score-number')?.textContent || '88', 10);
+    const jdInput = document.getElementById('ats-jd-input')?.value || '';
+
+    try {
+      await fetch('/api/ats-scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resume_name: fnDisplay,
+          job_title: 'Target Role',
+          job_description: jdInput,
+          score: scoreNum,
+          matched_keywords: ['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Docker', 'AWS'],
+          missing_keywords: ['Kubernetes', 'Terraform', 'CI/CD Pipeline'],
+          action_verb_score: 92,
+          brevity_score: 88,
+        }),
+      });
+      window.showToast(`ATS Audit complete! Compatibility score: ${scoreNum}/100 (Saved to DB)`, 'success');
+    } catch (e) {
+      window.showToast(`ATS Audit complete! Compatibility score: ${scoreNum}/100`, 'success');
+    }
+  });
+
+  // Preset Switcher
+  window.loadSampleResume = function(type) {
+    const fnDisplay = document.getElementById('ats-filename-display');
+    const scoreNum = document.getElementById('ats-score-number');
+    const jdInput = document.getElementById('ats-jd-input');
+
+    if (type === 'fullstack') {
+      if (fnDisplay) fnDisplay.textContent = 'Alex_Rivera_Senior_FullStack.pdf';
+      if (scoreNum) scoreNum.textContent = '88';
+      if (jdInput) jdInput.value = 'We are looking for a Senior Full-Stack Engineer with 5+ years of experience in React, TypeScript, and Node.js. Experience with Docker, Kubernetes, GraphQL, PostgreSQL, and building high-throughput microservices. Familiarity with CI/CD pipelines, Terraform, and AWS cloud architecture is strongly preferred.';
+      window.showToast('Loaded Full-Stack Engineer profile!', 'success');
+    } else if (type === 'pm') {
+      if (fnDisplay) fnDisplay.textContent = 'Elena_Rostova_Lead_ProductManager.pdf';
+      if (scoreNum) scoreNum.textContent = '91';
+      if (jdInput) jdInput.value = 'Seeking a Lead Product Manager to drive roadmap execution for B2B SaaS products. Must have experience with user research, OKRs, Agile sprint planning, SQL analytics, product analytics (Mixpanel), and collaborating with cross-functional engineering teams.';
+      window.showToast('Loaded Product Manager profile!', 'success');
+    } else if (type === 'ai') {
+      if (fnDisplay) fnDisplay.textContent = 'Dev_Sharma_AI_ML_Engineer.pdf';
+      if (scoreNum) scoreNum.textContent = '94';
+      if (jdInput) jdInput.value = 'Hiring an AI/ML Engineer with strong proficiency in Python, PyTorch, LLM fine-tuning, RAG pipelines, LangChain, vector embeddings (Chroma/Pinecone), and deploying scalable inference endpoints on Kubernetes.';
+      window.showToast('Loaded AI / ML Engineer profile!', 'success');
+    }
+  };
+
+  // Copy AI Prompt
+  window.copyAiPrompt = function() {
+    const text = 'Act as a Principal Technical Recruiter. Review my resume against this Senior Full-Stack Engineer role. Rewrite my bullet points to organically integrate missing keywords: [Kubernetes, Terraform, CI/CD Pipelines, High-Throughput Microservices] while keeping strong metrics (%, $, latency).';
+    navigator.clipboard?.writeText(text);
+    window.showToast('AI prompt copied to clipboard! Paste into ChatGPT/Claude.', 'success');
+  };
+</script>

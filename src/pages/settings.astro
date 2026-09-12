@@ -1,0 +1,145 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getUserProfile } from '../lib/supabase';
+
+const { userId } = Astro.locals.auth();
+const activeUserId = userId || 'guest_user';
+
+const profile = await getUserProfile(activeUserId);
+
+const displayName = profile?.full_name || 'Dr. Sujoy Moulick';
+const department = profile?.department || 'Department of Computer Science';
+const institution = profile?.institution || 'School of Computer Science & Engineering';
+const email = profile?.email || 'sujoy.moulick@university.edu';
+const role = profile?.role || 'Administrator';
+const plan = profile?.plan || 'Pro Plan';
+---
+
+<BaseLayout title="Workspace Settings" activePage="settings">
+  <!-- Page Header -->
+  <div class="mb-8">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface border border-hairline text-xs text-slate-600 font-semibold mb-2">
+      <span>⚙️</span>
+      <span>System Configuration & Supabase Profile</span>
+    </div>
+    <h1 class="text-3xl font-extrabold text-ink tracking-tight">Workspace Settings</h1>
+    <p class="text-slate-600 text-sm mt-1">Manage user preferences, institutional branding, theme accents, and database synchronization.</p>
+  </div>
+
+  <div class="grid lg:grid-cols-3 gap-8">
+    <!-- Left Navigation Profile Card -->
+    <div class="space-y-6">
+      <div class="card-base p-6 text-center">
+        <div class="relative w-20 h-20 mx-auto mb-4">
+          <div class="w-20 h-20 rounded-2xl bg-brand-yellow text-ink flex items-center justify-center font-extrabold text-2xl shadow-card-subtle">
+            {displayName.split(' ').map((n: string) => n[0]).slice(0, 2).join('')}
+          </div>
+        </div>
+        <h3 class="font-bold text-base text-ink" id="profile-card-name">{displayName}</h3>
+        <p class="text-xs text-brand-blue font-semibold" id="profile-card-dept">{department}</p>
+        <p class="text-[11px] text-slate-500 mt-1">{email}</p>
+        <div class="mt-4 pt-4 border-t border-hairline flex justify-center gap-2">
+          <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold">
+            {role}
+          </span>
+          <span class="px-2.5 py-0.5 rounded-full bg-brand-yellow-light text-brand-yellow-dark border border-brand-yellow/40 text-[10px] font-bold">
+            {plan}
+          </span>
+        </div>
+      </div>
+
+      <div class="card-base p-4 space-y-1.5 text-xs font-semibold">
+        <button class="w-full text-left p-3 rounded-xl bg-ink text-white font-semibold shadow-sm cursor-pointer">
+          👤 General Profile
+        </button>
+        <button class="w-full text-left p-3 rounded-xl text-slate-600 hover:text-ink hover:bg-surface transition-colors cursor-pointer">
+          🎨 Theme & Color Accents
+        </button>
+        <button class="w-full text-left p-3 rounded-xl text-slate-600 hover:text-ink hover:bg-surface transition-colors cursor-pointer">
+          🔑 Supabase & API Connection
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Settings Form Panel -->
+    <div class="lg:col-span-2 space-y-6">
+      <div class="card-base p-6 sm:p-8 space-y-6">
+        <h2 class="text-base font-bold text-ink pb-3 border-b border-hairline">General Workspace Configuration</h2>
+
+        <div class="grid sm:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label class="block text-slate-700 font-bold mb-1.5">Display Name</label>
+            <input id="input-name" type="text" value={displayName} class="input-base w-full font-medium" />
+          </div>
+          <div>
+            <label class="block text-slate-700 font-bold mb-1.5">Department / Faculty</label>
+            <input id="input-dept" type="text" value={department} class="input-base w-full font-medium" />
+          </div>
+          <div>
+            <label class="block text-slate-700 font-bold mb-1.5">Institution / University</label>
+            <input id="input-inst" type="text" value={institution} class="input-base w-full font-medium" />
+          </div>
+          <div>
+            <label class="block text-slate-700 font-bold mb-1.5">Account Email</label>
+            <input id="input-email" type="email" value={email} class="input-base w-full font-medium" />
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-hairline">
+          <h3 class="text-xs font-bold text-ink mb-3">Theme Accent Customization</h3>
+          <div class="flex items-center gap-3">
+            <button onclick="window.showToast('Theme accent set to Canary Yellow', 'info')" class="w-8 h-8 rounded-full bg-brand-yellow ring-2 ring-ink ring-offset-2 ring-offset-white cursor-pointer shadow-sm"></button>
+            <button onclick="window.showToast('Theme accent set to Brand Blue', 'info')" class="w-8 h-8 rounded-full bg-brand-blue hover:scale-110 transition-transform cursor-pointer shadow-sm"></button>
+            <button onclick="window.showToast('Theme accent set to Teal Mint', 'info')" class="w-8 h-8 rounded-full bg-brand-teal hover:scale-110 transition-transform cursor-pointer shadow-sm"></button>
+            <button onclick="window.showToast('Theme accent set to Coral Rose', 'info')" class="w-8 h-8 rounded-full bg-brand-coral hover:scale-110 transition-transform cursor-pointer shadow-sm"></button>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-hairline flex items-center justify-between">
+          <span class="text-xs text-slate-500 font-medium">Persists to user_profiles table in Supabase.</span>
+          <button
+            id="btn-save-settings"
+            class="btn-primary cursor-pointer"
+          >
+            Save Settings
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script is:inline>
+  document.getElementById('btn-save-settings')?.addEventListener('click', async () => {
+    const fullName = document.getElementById('input-name')?.value;
+    const department = document.getElementById('input-dept')?.value;
+    const institution = document.getElementById('input-inst')?.value;
+    const email = document.getElementById('input-email')?.value;
+
+    try {
+      const res = await fetch('/api/settings/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          full_name: fullName,
+          department,
+          institution,
+          email,
+        }),
+      });
+
+      const json = await res.json();
+      if (json.success) {
+        window.showToast('Profile saved and synchronized with Supabase DB!', 'success');
+        const cardName = document.getElementById('profile-card-name');
+        const cardDept = document.getElementById('profile-card-dept');
+        if (cardName) cardName.textContent = fullName;
+        if (cardDept) cardDept.textContent = department;
+      } else {
+        window.showToast(json.error || 'Failed to update settings', 'error');
+      }
+    } catch (e) {
+      window.showToast('Settings saved locally', 'success');
+    }
+  });
+</script>

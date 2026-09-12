@@ -1,0 +1,141 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --brand-primary: #1c1c1e;
+    --brand-yellow: #ffd02f;
+    --brand-blue: #4262ff;
+    --hairline: #e0e2e8;
+    --canvas: #ffffff;
+    --surface: #f7f8fa;
+  }
+
+  * {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    box-sizing: border-box;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    @apply bg-white text-ink antialiased selection:bg-brand-yellow/40 selection:text-ink min-h-screen;
+    overflow-x: hidden;
+  }
+
+  /* Custom Clean Light Theme Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f7f8fa;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #c7cad5;
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #8e91a0;
+  }
+}
+
+@layer components {
+  /* Button Styles from DESIGN.md */
+  .btn-primary {
+    @apply inline-flex items-center justify-center bg-ink text-white font-medium rounded-full px-5 py-2.5 text-xs transition-all hover:bg-charcoal active:scale-[0.98] shadow-sm cursor-pointer;
+  }
+
+  .btn-yellow {
+    @apply inline-flex items-center justify-center bg-brand-yellow text-ink font-semibold rounded-full px-5 py-2.5 text-xs transition-all hover:bg-brand-yellow-deep active:scale-[0.98] shadow-yellow-glow cursor-pointer;
+  }
+
+  .btn-blue {
+    @apply inline-flex items-center justify-center bg-brand-blue text-white font-medium rounded-full px-5 py-2.5 text-xs transition-all hover:bg-brand-blue-pressed active:scale-[0.98] shadow-blue-glow cursor-pointer;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center bg-white text-ink font-medium rounded-full px-5 py-2.5 text-xs border border-hairline-strong hover:bg-surface active:scale-[0.98] transition-all cursor-pointer;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center bg-transparent text-ink font-medium rounded-lg px-3 py-1.5 text-xs hover:bg-surface transition-all cursor-pointer;
+  }
+
+  /* Miro / DESIGN.md Card System */
+  .card-base {
+    background: #ffffff;
+    border: 1px solid #e0e2e8;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(5, 0, 56, 0.04);
+  }
+
+  .card-hover {
+    background: #ffffff;
+    border: 1px solid #e0e2e8;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(5, 0, 56, 0.04);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .card-hover:hover {
+    border-color: #c7cad5;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -4px rgba(5, 0, 56, 0.08);
+  }
+
+  .card-feature {
+    background: #ffffff;
+    border: 1px solid #e0e2e8;
+    border-radius: 24px;
+    box-shadow: 0 4px 16px rgba(5, 0, 56, 0.05);
+  }
+
+  /* Pastel Feature Cards */
+  .card-feature-yellow {
+    background: #fff8e0;
+    border: 1px solid rgba(255, 208, 47, 0.5);
+    border-radius: 24px;
+  }
+
+  .card-feature-coral {
+    background: #fff1f1;
+    border: 1px solid rgba(255, 153, 153, 0.5);
+    border-radius: 24px;
+  }
+
+  .card-feature-teal {
+    background: #e6faf8;
+    border: 1px solid rgba(15, 188, 176, 0.4);
+    border-radius: 24px;
+  }
+
+  .card-feature-rose {
+    background: #fdf2f8;
+    border: 1px solid rgba(255, 216, 244, 0.8);
+    border-radius: 24px;
+  }
+
+  .card-feature-lavender {
+    background: #f5f3ff;
+    border: 2px solid #4262ff;
+    border-radius: 24px;
+  }
+
+  /* Input fields */
+  .input-base {
+    @apply bg-white text-ink border border-hairline-strong rounded-xl px-3.5 py-2.5 text-xs focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20 outline-none transition-all placeholder:text-muted;
+  }
+
+  .search-pill {
+    @apply bg-surface text-slate-600 border border-hairline rounded-full px-4 py-2 text-xs focus:border-brand-blue focus:bg-white outline-none transition-all placeholder:text-muted;
+  }
+}

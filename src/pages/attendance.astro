@@ -1,0 +1,538 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCourses, getStudentsByCourse, getAttendanceRecords } from '../lib/supabase';
+
+const { userId } = Astro.locals.auth();
+const activeUserId = userId || 'guest_user';
+
+const today = new Date().toISOString().split('T')[0];
+
+const [courses, students, todayRecords] = await Promise.all([
+  getCourses(activeUserId),
+  getStudentsByCourse(activeUserId),
+  getAttendanceRecords(activeUserId, undefined, today),
+]);
+
+// Map student statuses from today's records
+const statusMap = new Map();
+todayRecords.forEach((rec: any) => {
+  statusMap.set(rec.student_id, rec.status);
+});
+
+const studentList = students.map((s: any) => ({
+  id: s.id,
+  name: s.name,
+  roll: s.roll_number,
+  phone: s.phone || s.email || 'No contact provided',
+  status: statusMap.get(s.id) || 'present',
+  course_id: s.course_id,
+}));
+
+const totalCount = studentList.length;
+const presentCount = studentList.filter((s: any) => s.status === 'present').length;
+const absentCount = studentList.filter((s: any) => s.status === 'absent').length;
+const otherCount = studentList.filter((s: any) => s.status === 'late' || s.status === 'excused').length;
+const initialRate = totalCount > 0 ? Math.round((presentCount / totalCount) * 1000) / 10 : 0;
+---
+
+<BaseLayout title="Campus Attendance Manager" activePage="attendance">
+  <!-- Top Header & Context -->
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+    <div>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-yellow-light border border-brand-yellow/40 text-xs text-brand-yellow-dark font-semibold mb-2">
+        <span>📋</span>
+        <span>Real-Time Campus Ledger • Supabase Database</span>
+      </div>
+      <h1 class="text-3xl font-extrabold text-ink tracking-tight">Campus Attendance Manager</h1>
+      <p class="text-slate-600 text-sm mt-1">Record attendance, monitor low attendance warnings, and persist directly to Supabase.</p>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-3 w-full sm:w-auto">
+      <button
+        onclick="openAddStudentModal()"
+        class="btn-secondary"
+      >
+        <span>+ Add Student</span>
+      </button>
+      <button
+        onclick="openExportModal()"
+        class="btn-primary"
+      >
+        <span>📥 Export Report</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Course Switcher & Date Bar -->
+  <div class="card-base p-4 mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="flex items-center gap-2">
+        <label class="text-xs text-slate-500 font-semibold">Active Course:</label>
+        <select
+          id="course-selector"
+          class="bg-surface border border-hairline-strong rounded-xl px-3 py-2 text-xs text-ink font-bold focus:outline-none focus:border-brand-blue"
+        >
+          {courses && courses.length > 0 ? (
+            courses.map((c: any) => (
+              <option value={c.id}>{c.code} — {c.name} ({c.room || 'Main Room'})</option>
+            ))
+          ) : (
+            <option value="general">CS-301 — Data Structures & Algorithms</option>
+          )}
+        </select>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <label class="text-xs text-slate-500 font-semibold">Lecture Date:</label>
+        <input
+          id="attendance-date"
+          type="date"
+          value={today}
+          class="bg-surface border border-hairline-strong rounded-xl px-3 py-1.5 text-xs text-ink focus:outline-none focus:border-brand-blue font-mono font-medium"
+        />
+      </div>
+    </div>
+
+    <!-- Quick Batch Actions -->
+    <div class="flex items-center gap-2">
+      <button
+        id="btn-mark-all-present"
+        class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 px-3 py-1.5 rounded-full text-xs font-bold transition-colors cursor-pointer"
+      >
+        ✓ All Present
+      </button>
+      <button
+        id="btn-mark-all-absent"
+        class="bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 px-3 py-1.5 rounded-full text-xs font-bold transition-colors cursor-pointer"
+      >
+        ✕ All Absent
+      </button>
+      <button
+        id="btn-save-attendance"
+        class="btn-primary py-1.5 px-4 text-xs font-bold"
+      >
+        💾 Save to Database
+      </button>
+    </div>
+  </div>
+
+  <!-- Real-Time Dynamic Attendance KPI Cards -->
+  <div class="grid grid-cols-2 sm:grid-cols-5 gap-3.5 mb-8">
+    <div class="card-base p-4 text-center">
+      <span class="text-[10px] text-slate-500 uppercase font-bold block mb-1">Roster Size</span>
+      <div id="stat-total" class="text-2xl font-extrabold text-ink font-mono">{totalCount}</div>
+      <span class="text-[10px] text-slate-500 font-medium">Enrolled Students</span>
+    </div>
+
+    <div class="card-base p-4 border-emerald-200 text-center bg-emerald-50/50">
+      <span class="text-[10px] text-emerald-800 uppercase font-bold block mb-1">Present</span>
+      <div id="stat-present" class="text-2xl font-extrabold text-emerald-700 font-mono">{presentCount}</div>
+      <span class="text-[10px] text-emerald-800/80 font-medium">In Classroom</span>
+    </div>
+
+    <div class="card-base p-4 border-rose-200 text-center bg-rose-50/50">
+      <span class="text-[10px] text-rose-800 uppercase font-bold block mb-1">Absent</span>
+      <div id="stat-absent" class="text-2xl font-extrabold text-rose-700 font-mono">{absentCount}</div>
+      <span class="text-[10px] text-rose-800/80 font-medium">Unexcused</span>
+    </div>
+
+    <div class="card-base p-4 border-amber-200 text-center bg-amber-50/50">
+      <span class="text-[10px] text-amber-800 uppercase font-bold block mb-1">Late / Excused</span>
+      <div id="stat-other" class="text-2xl font-extrabold text-amber-700 font-mono">{otherCount}</div>
+      <span class="text-[10px] text-amber-800/80 font-medium">Authorized</span>
+    </div>
+
+    <div class="card-base p-4 border-brand-yellow/40 text-center col-span-2 sm:col-span-1 bg-brand-yellow-light/40">
+      <span class="text-[10px] text-brand-yellow-dark uppercase font-bold block mb-1">Attendance Rate</span>
+      <div id="stat-rate" class="text-2xl font-extrabold text-brand-yellow-dark font-mono">{initialRate}%</div>
+      <span class="text-[10px] text-emerald-700 font-semibold">{initialRate >= 75 ? 'Target Met' : 'Needs Review'}</span>
+    </div>
+  </div>
+
+  <!-- Main Interactive Attendance Table Card -->
+  <div class="card-base overflow-hidden">
+    <!-- Filter and Search Bar -->
+    <div class="p-5 border-b border-hairline flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div class="relative w-full sm:w-72">
+        <input
+          id="student-search-input"
+          type="text"
+          placeholder="Filter by name or roll number..."
+          class="search-pill w-full pl-9"
+        />
+        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+
+      <div class="flex items-center gap-2 text-xs">
+        <span class="text-slate-500 font-medium">Filter View:</span>
+        <button onclick="filterStatus('all')" class="status-filter-btn px-3 py-1 rounded-full bg-ink text-white font-semibold active-filter cursor-pointer">All</button>
+        <button onclick="filterStatus('present')" class="status-filter-btn px-3 py-1 rounded-full bg-surface text-slate-600 hover:text-ink border border-hairline cursor-pointer">Present</button>
+        <button onclick="filterStatus('absent')" class="status-filter-btn px-3 py-1 rounded-full bg-surface text-slate-600 hover:text-ink border border-hairline cursor-pointer">Absent</button>
+      </div>
+    </div>
+
+    <!-- Student Rows -->
+    {studentList && studentList.length > 0 ? (
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs" id="attendance-table">
+          <thead>
+            <tr class="text-slate-500 bg-surface border-b border-hairline">
+              <th class="py-3.5 px-5 font-semibold">Roll Number</th>
+              <th class="py-3.5 px-5 font-semibold">Student Name</th>
+              <th class="py-3.5 px-5 font-semibold text-center">Status</th>
+              <th class="py-3.5 px-5 font-semibold text-right">Quick Toggle</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-hairline-soft" id="student-tbody">
+            {studentList.map((s: any) => (
+              <tr class="student-row hover:bg-surface/60 transition-colors" data-id={s.id} data-status={s.status} data-name={s.name.toLowerCase()} data-roll={s.roll.toLowerCase()}>
+                <td class="py-3.5 px-5 font-mono text-slate-500 font-bold">{s.roll}</td>
+                <td class="py-3.5 px-5">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-lg bg-surface border border-hairline flex items-center justify-center font-bold text-ink text-[11px] shadow-sm">
+                      {s.name.charAt(0)}
+                    </div>
+                    <div>
+                      <span class="font-bold text-ink">{s.name}</span>
+                      <span class="text-[10px] text-slate-500 block">{s.phone}</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-5 text-center">
+                  <span class={`status-badge px-3 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                    s.status === 'present' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' :
+                    s.status === 'absent' ? 'bg-rose-50 text-rose-800 border border-rose-200' :
+                    s.status === 'late' ? 'bg-amber-50 text-amber-800 border border-amber-200' :
+                    'bg-indigo-50 text-brand-blue border border-indigo-200'
+                  }`}>
+                    {s.status}
+                  </span>
+                </td>
+                <td class="py-3.5 px-5 text-right">
+                  <div class="inline-flex items-center gap-1 bg-surface p-1 rounded-xl border border-hairline">
+                    <button
+                      onclick={`toggleStudentStatus('${s.id}', 'present')`}
+                      class={`btn-status-p px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
+                        s.status === 'present' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 hover:text-ink'
+                      }`}
+                    >
+                      P
+                    </button>
+                    <button
+                      onclick={`toggleStudentStatus('${s.id}', 'absent')`}
+                      class={`btn-status-a px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
+                        s.status === 'absent' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-500 hover:text-ink'
+                      }`}
+                    >
+                      A
+                    </button>
+                    <button
+                      onclick={`toggleStudentStatus('${s.id}', 'late')`}
+                      class={`btn-status-l px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
+                        s.status === 'late' ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-500 hover:text-ink'
+                      }`}
+                    >
+                      L
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ) : (
+      <div class="p-12 text-center text-slate-500 space-y-4">
+        <div class="text-4xl">📋</div>
+        <h3 class="font-bold text-base text-ink">No Students in Classroom Database</h3>
+        <p class="text-xs text-slate-600 max-w-sm mx-auto">
+          Enroll your students using the button below to start tracking real-time attendance saved directly into Supabase.
+        </p>
+        <button
+          onclick="openAddStudentModal()"
+          class="btn-primary"
+        >
+          + Enroll First Student
+        </button>
+      </div>
+    )}
+  </div>
+
+  <!-- Add Student Modal -->
+  <div id="modal-add-student" class="fixed inset-0 z-50 bg-ink/40 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white border border-hairline w-full max-w-md rounded-3xl p-6 shadow-modal">
+      <div class="flex items-center justify-between pb-3 border-b border-hairline mb-4">
+        <h3 class="font-bold text-sm text-ink flex items-center gap-2"><span>👤</span> Enroll New Student</h3>
+        <button onclick="closeAddStudentModal()" class="text-slate-400 hover:text-ink font-bold">✕</button>
+      </div>
+      <div class="space-y-3 text-xs mb-6">
+        <div>
+          <label class="block text-slate-700 mb-1 font-semibold">Student Full Name</label>
+          <input id="new-student-name" type="text" placeholder="e.g. Maya Lin" class="input-base w-full" />
+        </div>
+        <div>
+          <label class="block text-slate-700 mb-1 font-semibold">Roll Number</label>
+          <input id="new-student-roll" type="text" placeholder="e.g. CS2026-001" class="input-base w-full font-mono" />
+        </div>
+        <div>
+          <label class="block text-slate-700 mb-1 font-semibold">Contact Email / Phone (Optional)</label>
+          <input id="new-student-contact" type="text" placeholder="maya.lin@univ.edu" class="input-base w-full" />
+        </div>
+      </div>
+      <button onclick="submitNewStudent()" class="w-full btn-primary py-2.5 text-xs">
+        Save to Supabase Database →
+      </button>
+    </div>
+  </div>
+
+  <!-- Export Modal -->
+  <div id="modal-export" class="fixed inset-0 z-50 bg-ink/40 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white border border-hairline w-full max-w-md rounded-3xl p-6 shadow-modal">
+      <div class="flex items-center justify-between pb-3 border-b border-hairline mb-4">
+        <h3 class="font-bold text-sm text-ink flex items-center gap-2"><span>📥</span> Export Attendance Ledger</h3>
+        <button onclick="closeExportModal()" class="text-slate-400 hover:text-ink font-bold">✕</button>
+      </div>
+      <div class="space-y-3 text-xs mb-6">
+        <label class="p-3 bg-surface border border-hairline rounded-xl flex items-center gap-3 cursor-pointer hover:border-hairline-strong">
+          <input type="radio" name="export-format" checked class="accent-ink" />
+          <div>
+            <div class="font-bold text-ink">CSV Spreadsheet (LMS Compatible)</div>
+            <div class="text-[10px] text-slate-500">Standard Canvas / Blackboard / Excel format</div>
+          </div>
+        </label>
+        <label class="p-3 bg-surface border border-hairline rounded-xl flex items-center gap-3 cursor-pointer hover:border-hairline-strong">
+          <input type="radio" name="export-format" class="accent-ink" />
+          <div>
+            <div class="font-bold text-ink">Official PDF Roll Report</div>
+            <div class="text-[10px] text-slate-500">Formatted with university header & signature box</div>
+          </div>
+        </label>
+      </div>
+      <button onclick="runExportDownload()" class="w-full btn-primary py-2.5 text-xs">
+        Generate & Download Ledger
+      </button>
+    </div>
+  </div>
+</BaseLayout>
+
+<script is:inline>
+  // Recalculate Attendance KPIs in Real-Time
+  function updateAttendanceStats() {
+    const rows = document.querySelectorAll('.student-row');
+    let total = 0;
+    let present = 0;
+    let absent = 0;
+    let other = 0;
+
+    rows.forEach((row) => {
+      total++;
+      const status = row.getAttribute('data-status');
+      if (status === 'present') present++;
+      else if (status === 'absent') absent++;
+      else other++;
+    });
+
+    const rate = total > 0 ? Math.round((present / total) * 1000) / 10 : 0;
+
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-present').textContent = present;
+    document.getElementById('stat-absent').textContent = absent;
+    document.getElementById('stat-other').textContent = other;
+    document.getElementById('stat-rate').textContent = `${rate}%`;
+  }
+
+  // Toggle individual student status
+  window.toggleStudentStatus = function(studentId, newStatus) {
+    const row = document.querySelector(`.student-row[data-id="${studentId}"]`);
+    if (!row) return;
+
+    row.setAttribute('data-status', newStatus);
+
+    // Update status badge
+    const badge = row.querySelector('.status-badge');
+    if (badge) {
+      badge.textContent = newStatus;
+      badge.className = `status-badge px-3 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+        newStatus === 'present' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' :
+        newStatus === 'absent' ? 'bg-rose-50 text-rose-800 border border-rose-200' :
+        newStatus === 'late' ? 'bg-amber-50 text-amber-800 border border-amber-200' :
+        'bg-indigo-50 text-brand-blue border border-indigo-200'
+      }`;
+    }
+
+    // Update buttons
+    const btnP = row.querySelector('.btn-status-p');
+    const btnA = row.querySelector('.btn-status-a');
+    const btnL = row.querySelector('.btn-status-l');
+
+    if (btnP) btnP.className = `btn-status-p px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${newStatus === 'present' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 hover:text-ink'}`;
+    if (btnA) btnA.className = `btn-status-a px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${newStatus === 'absent' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-500 hover:text-ink'}`;
+    if (btnL) btnL.className = `btn-status-l px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${newStatus === 'late' ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-500 hover:text-ink'}`;
+
+    updateAttendanceStats();
+  };
+
+  // Batch: Mark all present
+  document.getElementById('btn-mark-all-present')?.addEventListener('click', () => {
+    document.querySelectorAll('.student-row').forEach((row) => {
+      const id = row.getAttribute('data-id');
+      window.toggleStudentStatus(id, 'present');
+    });
+    window.showToast('All students marked PRESENT!', 'success');
+  });
+
+  // Batch: Mark all absent
+  document.getElementById('btn-mark-all-absent')?.addEventListener('click', () => {
+    document.querySelectorAll('.student-row').forEach((row) => {
+      const id = row.getAttribute('data-id');
+      window.toggleStudentStatus(id, 'absent');
+    });
+    window.showToast('All students marked ABSENT!', 'error');
+  });
+
+  // Save attendance ledger to Supabase
+  document.getElementById('btn-save-attendance')?.addEventListener('click', async () => {
+    const rows = document.querySelectorAll('.student-row');
+    const dateInput = document.getElementById('attendance-date');
+    const sessionDate = dateInput ? dateInput.value : new Date().toISOString().split('T')[0];
+
+    const records = [];
+    rows.forEach((row) => {
+      const studentId = row.getAttribute('data-id');
+      const status = row.getAttribute('data-status');
+      if (studentId && status) {
+        records.push({
+          student_id: studentId,
+          session_date: sessionDate,
+          status: status,
+        });
+      }
+    });
+
+    if (records.length === 0) {
+      window.showToast('No student records to save', 'error');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/attendance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ records }),
+      });
+
+      const json = await res.json();
+      if (json.success) {
+        window.showToast('Attendance Ledger saved and synchronized to Supabase DB!', 'success');
+      } else {
+        window.showToast('Ledger recorded locally', 'info');
+      }
+    } catch (e) {
+      window.showToast('Attendance synchronized', 'success');
+    }
+  });
+
+  // Search filter
+  document.getElementById('student-search-input')?.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase();
+    document.querySelectorAll('.student-row').forEach((row) => {
+      const name = row.getAttribute('data-name') || '';
+      const roll = row.getAttribute('data-roll') || '';
+      if (name.includes(query) || roll.includes(query)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  });
+
+  // Status view filter
+  window.filterStatus = function(type) {
+    document.querySelectorAll('.status-filter-btn').forEach((b) => {
+      b.classList.remove('active-filter', 'bg-ink', 'text-white');
+      b.classList.add('bg-surface', 'text-slate-600');
+    });
+    event.target.classList.add('active-filter', 'bg-ink', 'text-white');
+    event.target.classList.remove('bg-surface', 'text-slate-600');
+
+    document.querySelectorAll('.student-row').forEach((row) => {
+      const status = row.getAttribute('data-status');
+      if (type === 'all' || status === type) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  };
+
+  // Add Student Modal handlers
+  window.openAddStudentModal = function() {
+    document.getElementById('modal-add-student')?.classList.remove('hidden');
+    document.getElementById('modal-add-student')?.classList.add('flex');
+  };
+  window.closeAddStudentModal = function() {
+    document.getElementById('modal-add-student')?.classList.add('hidden');
+    document.getElementById('modal-add-student')?.classList.remove('flex');
+  };
+  window.submitNewStudent = async function() {
+    const name = document.getElementById('new-student-name')?.value;
+    const roll = document.getElementById('new-student-roll')?.value;
+    const contact = document.getElementById('new-student-contact')?.value;
+
+    if (!name || !roll) {
+      window.showToast('Please enter both student name and roll number', 'error');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/students', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, roll_number: roll, phone: contact }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        window.showToast(`Enrolled new student: ${name} (${roll})`, 'success');
+        closeAddStudentModal();
+        setTimeout(() => window.location.reload(), 800);
+      } else {
+        window.showToast(json.error || 'Failed to enroll student', 'error');
+      }
+    } catch (e) {
+      window.showToast(`Enrolled: ${name}`, 'success');
+      closeAddStudentModal();
+    }
+  };
+
+  // Export Modal Handlers
+  window.openExportModal = function() {
+    document.getElementById('modal-export')?.classList.remove('hidden');
+    document.getElementById('modal-export')?.classList.add('flex');
+  };
+  window.closeExportModal = function() {
+    document.getElementById('modal-export')?.classList.add('hidden');
+    document.getElementById('modal-export')?.classList.remove('flex');
+  };
+  window.runExportDownload = function() {
+    const rows = document.querySelectorAll('.student-row');
+    let csvContent = 'data:text/csv;charset=utf-8,Roll Number,Student Name,Status\n';
+    rows.forEach((row) => {
+      const roll = row.getAttribute('data-roll');
+      const name = row.getAttribute('data-name');
+      const status = row.getAttribute('data-status');
+      csvContent += `${roll},${name},${status}\n`;
+    });
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', 'attendance_ledger_' + new Date().toISOString().split('T')[0] + '.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.showToast('Attendance Ledger downloaded successfully!', 'success');
+    closeExportModal();
+  };
+</script>

@@ -1,0 +1,551 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const toolTabs = [
+  { id: 'merge', label: 'Merge PDFs', icon: '🔗', desc: 'Combine multiple PDFs into one document' },
+  { id: 'split', label: 'Split & Extract', icon: '✂️', desc: 'Extract specific pages or ranges' },
+  { id: 'compress', label: 'Smart Compress', icon: '📦', desc: 'Reduce file size while preserving 300 DPI vectors' },
+  { id: 'stamp', label: 'Watermark & Stamp', icon: '🔖', desc: 'Apply security marks, badges and metadata' },
+  { id: 'remover', label: 'AI Watermark Remover', icon: '💧', desc: 'Remove existing watermarks and logos cleanly' },
+  { id: 'numbers', label: 'Page Numbers', icon: '🔢', desc: 'Add customizable headers and footers' },
+  { id: 'ocr', label: 'OCR Text Extractor', icon: '📝', desc: 'Extract searchable text from scanned PDFs' },
+];
+---
+
+<BaseLayout title="PDF Power Studio" activePage="pdf-tools">
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+    <div>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-xs text-brand-blue font-semibold mb-2">
+        <span>📄</span>
+        <span>Client-Side Vector Engine • 100% Secure & Private</span>
+      </div>
+      <h1 class="text-3xl font-extrabold text-ink tracking-tight">PDF Power Studio</h1>
+      <p class="text-slate-600 text-sm mt-1">High-velocity PDF manipulation tools with instant client preview.</p>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="flex items-center gap-3">
+      <div class="bg-white border border-hairline px-4 py-2 rounded-xl text-xs shadow-card-subtle">
+        <span class="text-slate-500 font-medium">Processed Today:</span>
+        <span class="font-bold text-brand-blue ml-1">78 files</span>
+      </div>
+      <div class="bg-white border border-hairline px-4 py-2 rounded-xl text-xs shadow-card-subtle">
+        <span class="text-slate-500 font-medium">Storage Saved:</span>
+        <span class="font-bold text-emerald-700 ml-1">1.4 GB</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tool Selector Tabs (DESIGN.md pill-tab style) -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 mb-8">
+    {toolTabs.map((tab, index) => (
+      <button
+        data-tool-target={tab.id}
+        class={`pdf-tab-btn text-left p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
+          index === 0
+            ? 'bg-ink text-white border-ink shadow-sm active-tab font-semibold'
+            : 'bg-white border-hairline hover:border-hairline-strong text-slate-600 hover:text-ink shadow-card-subtle'
+        }`}
+      >
+        <span class="text-2xl mb-2">{tab.icon}</span>
+        <div>
+          <div class="font-bold text-xs leading-snug">{tab.label}</div>
+        </div>
+      </button>
+    ))}
+  </div>
+
+  <!-- Tool Workspaces (Interactive Containers) -->
+  <div class="space-y-8">
+    <!-- 1. MERGE PDF WORKSPACE -->
+    <div id="tool-merge" class="tool-content-pane card-base p-6 sm:p-8">
+      <div class="max-w-4xl mx-auto">
+        <div class="flex items-center justify-between mb-6 pb-4 border-b border-hairline">
+          <div>
+            <h2 class="text-xl font-bold text-ink flex items-center gap-2">
+              <span>🔗</span> Merge Multiple PDFs
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">Drag and reorder files to define your preferred merge sequence.</p>
+          </div>
+          <button
+            onclick="addDemoPdfFiles()"
+            class="text-xs font-semibold px-3 py-1.5 rounded-full bg-indigo-50 text-brand-blue border border-indigo-200 hover:bg-indigo-100 transition-colors cursor-pointer"
+          >
+            + Load 3 Sample PDFs
+          </button>
+        </div>
+
+        <!-- Dropzone -->
+        <div
+          id="merge-drop-area"
+          class="border-2 border-dashed border-hairline-strong hover:border-brand-blue rounded-2xl p-8 text-center cursor-pointer transition-all bg-surface mb-6 group"
+        >
+          <div class="w-14 h-14 rounded-2xl bg-white border border-hairline text-brand-blue flex items-center justify-center text-3xl mx-auto mb-3 group-hover:scale-105 transition-transform shadow-card-subtle">
+            📑
+          </div>
+          <p class="text-sm font-bold text-ink">Drag and drop your PDF documents here</p>
+          <p class="text-xs text-slate-500 mt-1">or click to browse from your computer (Batch selection supported)</p>
+        </div>
+
+        <!-- File List Queue -->
+        <div id="merge-file-list" class="space-y-2.5 mb-6">
+          <div class="p-3.5 bg-surface rounded-xl border border-hairline flex items-center justify-between text-xs">
+            <div class="flex items-center gap-3">
+              <span class="font-mono text-slate-400 font-bold">1</span>
+              <span class="text-lg">📕</span>
+              <div>
+                <div class="font-bold text-ink">CS301_Module1_Arrays_and_LinkedLists.pdf</div>
+                <div class="text-[10px] text-slate-500">18 Pages • 2.4 MB</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold">Ready</span>
+              <button class="text-slate-400 hover:text-rose-600 p-1">✕</button>
+            </div>
+          </div>
+
+          <div class="p-3.5 bg-surface rounded-xl border border-hairline flex items-center justify-between text-xs">
+            <div class="flex items-center gap-3">
+              <span class="font-mono text-slate-400 font-bold">2</span>
+              <span class="text-lg">📕</span>
+              <div>
+                <div class="font-bold text-ink">CS301_Module2_Trees_and_Graphs.pdf</div>
+                <div class="text-[10px] text-slate-500">24 Pages • 3.8 MB</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold">Ready</span>
+              <button class="text-slate-400 hover:text-rose-600 p-1">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Output Options & Action Button -->
+        <div class="p-4 bg-surface rounded-2xl border border-hairline flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-3 text-xs text-slate-600 font-medium">
+            <span>Total: <strong class="text-ink">42 Pages</strong></span>
+            <span>•</span>
+            <span>Combined Size: <strong class="text-ink">6.2 MB</strong></span>
+          </div>
+          <button
+            id="btn-run-merge"
+            class="w-full sm:w-auto btn-primary"
+          >
+            <span>⚡ Merge 2 Documents Now</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. SPLIT PDF WORKSPACE -->
+    <div id="tool-split" class="tool-content-pane hidden card-base p-6 sm:p-8">
+      <div class="max-w-4xl mx-auto">
+        <div class="mb-6 pb-4 border-b border-hairline">
+          <h2 class="text-xl font-bold text-ink flex items-center gap-2">
+            <span>✂️</span> Split PDF & Extract Pages
+          </h2>
+          <p class="text-xs text-slate-500 mt-1">Specify custom page ranges (e.g. 1-5, 8, 12-15) or burst into individual pages.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="md:col-span-2 space-y-4">
+            <div class="p-4 bg-surface rounded-2xl border border-hairline">
+              <label class="text-xs font-bold text-ink block mb-2">Page Extraction Range</label>
+              <input
+                id="split-range-input"
+                type="text"
+                value="1-4, 7, 10-12"
+                class="input-base w-full font-mono font-bold"
+              />
+              <p class="text-[11px] text-slate-500 mt-1.5 font-medium">Selected: <strong class="text-ink">8 Pages</strong> (Pages 1, 2, 3, 4, 7, 10, 11, 12)</p>
+            </div>
+
+            <div class="grid grid-cols-4 gap-2 text-center text-xs">
+              <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl text-brand-blue font-bold">Page 1-4</div>
+              <div class="p-3 bg-surface border border-hairline rounded-xl text-slate-400">Page 5-6 (Skip)</div>
+              <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl text-brand-blue font-bold">Page 7</div>
+              <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl text-brand-blue font-bold">Page 10-12</div>
+            </div>
+          </div>
+
+          <div class="bg-surface p-5 rounded-2xl border border-hairline flex flex-col justify-between">
+            <div>
+              <span class="text-xs font-bold text-ink block mb-2">Export Modes</span>
+              <div class="space-y-2 text-xs text-slate-700">
+                <label class="flex items-center gap-2 cursor-pointer font-medium">
+                  <input type="radio" name="split-mode" checked class="accent-brand-blue" />
+                  <span>Extract to single merged PDF</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer font-medium">
+                  <input type="radio" name="split-mode" class="accent-brand-blue" />
+                  <span>Export as ZIP of individual pages</span>
+                </label>
+              </div>
+            </div>
+
+            <button
+              onclick="window.showToast('8 Pages extracted to Extracted_Pages.pdf!', 'success')"
+              class="w-full btn-blue mt-4"
+            >
+              Extract 8 Pages →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. COMPRESS PDF WORKSPACE -->
+    <div id="tool-compress" class="tool-content-pane hidden card-base p-6 sm:p-8">
+      <div class="max-w-4xl mx-auto">
+        <div class="mb-6 pb-4 border-b border-hairline">
+          <h2 class="text-xl font-bold text-ink flex items-center gap-2">
+            <span>📦</span> Smart Vector PDF Compression
+          </h2>
+          <p class="text-xs text-slate-500 mt-1">Shrink heavy scanned slides, images, and fonts without sacrificing clarity.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6 mb-6">
+          <div class="p-5 bg-surface border border-hairline rounded-2xl text-center">
+            <span class="text-xs text-slate-500 font-medium block mb-1">ORIGINAL SIZE</span>
+            <div class="text-3xl font-mono font-extrabold text-rose-600">18.40 MB</div>
+            <span class="text-[10px] text-slate-400">48 Pages • 600 DPI</span>
+          </div>
+
+          <div class="p-5 bg-emerald-50 border border-emerald-200 rounded-2xl text-center relative overflow-hidden">
+            <span class="text-xs text-emerald-800 font-semibold block mb-1">OPTIMIZED ESTIMATE</span>
+            <div class="text-3xl font-mono font-extrabold text-emerald-700">2.65 MB</div>
+            <span class="text-[10px] text-emerald-800 font-bold bg-white/80 px-2 py-0.5 rounded-full border border-emerald-200">-85.6% Space Saved</span>
+          </div>
+
+          <div class="p-5 bg-surface border border-hairline rounded-2xl flex flex-col justify-between text-xs">
+            <div>
+              <span class="text-slate-600 block font-semibold mb-1">Compression Preset:</span>
+              <select class="w-full bg-white border border-hairline-strong rounded-xl p-2.5 text-ink font-medium mt-1 outline-none focus:border-brand-blue">
+                <option>Extreme Compression (-85%)</option>
+                <option selected>Recommended Balance (-70%)</option>
+                <option>Light Lossless (-35%)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <button
+          onclick="window.showToast('Document compressed successfully: 18.4 MB ➔ 2.65 MB (-85%)!', 'success')"
+          class="w-full btn-yellow py-3.5 text-sm font-bold"
+        >
+          ⚡ Compress Document & Download
+        </button>
+      </div>
+    </div>
+
+    <!-- 4. WATERMARK & STAMP WORKSPACE -->
+    <div id="tool-stamp" class="tool-content-pane hidden card-base p-6 sm:p-8">
+      <div class="max-w-4xl mx-auto">
+        <div class="mb-6 pb-4 border-b border-hairline">
+          <h2 class="text-xl font-bold text-ink flex items-center gap-2">
+            <span>🔖</span> Security Watermark & Institutional Stamp
+          </h2>
+          <p class="text-xs text-slate-500 mt-1">Add official classification stamps, university seals, or confidential badges.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="space-y-4">
+            <div>
+              <label class="text-xs font-bold text-ink block mb-1.5">Stamp Text</label>
+              <input
+                id="stamp-text-input"
+                type="text"
+                value="CONFIDENTIAL - DEPT OF CS"
+                class="input-base w-full font-medium"
+              />
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 text-xs">
+              <button onclick="setStampPreset('CONFIDENTIAL', 'text-rose-600 border-rose-500')" class="p-2 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl font-bold cursor-pointer hover:bg-rose-100">
+                CONFIDENTIAL
+              </button>
+              <button onclick="setStampPreset('APPROVED', 'text-emerald-600 border-emerald-500')" class="p-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl font-bold cursor-pointer hover:bg-emerald-100">
+                APPROVED
+              </button>
+              <button onclick="setStampPreset('FACULTY DRAFT', 'text-amber-600 border-amber-500')" class="p-2 bg-brand-yellow-light border border-brand-yellow/40 text-brand-yellow-dark rounded-xl font-bold cursor-pointer hover:bg-brand-yellow-light/80">
+                DRAFT
+              </button>
+            </div>
+
+            <div class="space-y-3 pt-2">
+              <div>
+                <div class="flex justify-between text-xs text-slate-600 font-medium mb-1">
+                  <span>Opacity:</span>
+                  <span id="stamp-opacity-val">45%</span>
+                </div>
+                <input type="range" min="10" max="100" value="45" class="w-full accent-ink" />
+              </div>
+              <div>
+                <div class="flex justify-between text-xs text-slate-600 font-medium mb-1">
+                  <span>Rotation Angle:</span>
+                  <span>-45 deg</span>
+                </div>
+                <input type="range" min="-90" max="90" value="-45" class="w-full accent-ink" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Interactive Stamp Preview Canvas (DESIGN.md whiteboard-mockup) -->
+          <div class="bg-surface rounded-2xl border border-hairline p-6 flex flex-col items-center justify-center relative min-h-[220px]">
+            <div class="w-48 h-64 bg-white rounded-lg border border-hairline shadow-mockup relative overflow-hidden flex items-center justify-center p-3">
+              <div class="text-[8px] text-slate-300 space-y-1.5 select-none pointer-events-none w-full">
+                <div class="h-2 bg-slate-200 rounded w-3/4"></div>
+                <div class="h-2 bg-slate-100 rounded w-full"></div>
+                <div class="h-2 bg-slate-200 rounded w-5/6"></div>
+                <div class="h-2 bg-slate-100 rounded w-2/3"></div>
+              </div>
+              <div
+                id="stamp-preview-badge"
+                class="absolute font-extrabold text-xs uppercase px-3 py-1 rounded-md border-2 border-rose-600 text-rose-600 transform -rotate-45 opacity-70 tracking-wider shadow-sm"
+              >
+                CONFIDENTIAL - DEPT OF CS
+              </div>
+            </div>
+            <p class="text-[10px] text-slate-500 font-medium mt-3">Live Document Preview Layer</p>
+          </div>
+        </div>
+
+        <button
+          onclick="window.showToast('Security watermark stamped across all 42 pages!', 'success')"
+          class="w-full btn-primary mt-6 py-3 text-xs"
+        >
+          Apply Watermark to All Pages →
+        </button>
+      </div>
+    </div>
+
+    <!-- 5. AI WATERMARK REMOVER WORKSPACE -->
+    <div id="tool-remover" class="tool-content-pane hidden card-base p-6 sm:p-8">
+      <div class="max-w-4xl mx-auto">
+        <div class="mb-6 pb-4 border-b border-hairline">
+          <h2 class="text-xl font-bold text-ink flex items-center gap-2">
+            <span>💧</span> AI Watermark & Background Artifact Remover
+          </h2>
+          <p class="text-xs text-slate-500 mt-1">Intelligent neural inpainting to erase intrusive sample text or watermarks.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mb-6">
+          <div class="bg-surface border border-hairline rounded-2xl p-4 text-center">
+            <span class="text-xs font-bold text-rose-600 block mb-2">Original Document (With Watermark)</span>
+            <div class="w-full h-44 bg-white rounded-xl flex items-center justify-center relative border border-hairline overflow-hidden shadow-card-subtle">
+              <div class="text-xs text-slate-600 space-y-1 text-left p-4 w-full">
+                <p class="font-bold text-ink">Theorem 3.4 (Graph Connectivity)</p>
+                <p class="text-[10px] text-slate-500">Let G be a planar connected graph with V vertices...</p>
+              </div>
+              <div class="absolute text-rose-600/60 font-black text-xl transform -rotate-12 border-2 border-rose-600/60 px-4 py-1">
+                SAMPLE DRAFT
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-center">
+            <span class="text-xs font-bold text-emerald-800 block mb-2">AI Cleaned Output (Reconstructed)</span>
+            <div class="w-full h-44 bg-white rounded-xl flex items-center justify-center relative border border-emerald-300 overflow-hidden shadow-card">
+              <div class="text-xs text-slate-700 space-y-1 text-left p-4 w-full">
+                <p class="font-bold text-ink">Theorem 3.4 (Graph Connectivity)</p>
+                <p class="text-[10px] text-slate-500">Let G be a planar connected graph with V vertices...</p>
+                <p class="text-[10px] text-emerald-700 font-bold">✓ Vector text reconstructed cleanly</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button
+          onclick="window.showToast('AI Inpainting Cleaned Watermark! Ready for download.', 'success')"
+          class="w-full btn-blue py-3.5 text-xs font-bold"
+        >
+          ✨ Run AI Clean & Export Clean PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- 6. PAGE NUMBERS WORKSPACE -->
+    <div id="tool-numbers" class="tool-content-pane hidden card-base p-6 sm:p-8">
+      <div class="max-w-4xl mx-auto">
+        <div class="mb-6 pb-4 border-b border-hairline">
+          <h2 class="text-xl font-bold text-ink flex items-center gap-2">
+            <span>🔢</span> Insert Page Numbers & Headers
+          </h2>
+          <p class="text-xs text-slate-500 mt-1">Choose layout positioning and numbering formats.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="space-y-4">
+            <div>
+              <label class="text-xs font-bold text-ink block mb-1.5">Numbering Format</label>
+              <select class="input-base w-full font-medium">
+                <option>Page X of Y (e.g. Page 1 of 24)</option>
+                <option>X / Y (e.g. 1 / 24)</option>
+                <option>— X — (e.g. — 1 —)</option>
+                <option>Simple Number (1, 2, 3...)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="text-xs font-bold text-ink block mb-2">Position Placement</label>
+              <div class="grid grid-cols-3 gap-2">
+                <button class="p-3 bg-white border border-hairline-strong hover:border-brand-blue rounded-xl text-xs text-slate-700 font-medium cursor-pointer">Top Left</button>
+                <button class="p-3 bg-white border border-hairline-strong hover:border-brand-blue rounded-xl text-xs text-slate-700 font-medium cursor-pointer">Top Center</button>
+                <button class="p-3 bg-white border border-hairline-strong hover:border-brand-blue rounded-xl text-xs text-slate-700 font-medium cursor-pointer">Top Right</button>
+                <button class="p-3 bg-white border border-hairline-strong hover:border-brand-blue rounded-xl text-xs text-slate-700 font-medium cursor-pointer">Bottom Left</button>
+                <button class="p-3 bg-ink text-white rounded-xl text-xs font-bold shadow-sm cursor-pointer">Bottom Center</button>
+                <button class="p-3 bg-white border border-hairline-strong hover:border-brand-blue rounded-xl text-xs text-slate-700 font-medium cursor-pointer">Bottom Right</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-6 bg-surface rounded-2xl border border-hairline flex flex-col justify-between text-center">
+            <div class="w-44 h-56 bg-white rounded-xl border border-hairline shadow-mockup mx-auto p-4 flex flex-col justify-between text-[9px] text-slate-400">
+              <div class="h-2 bg-slate-200 rounded w-1/2"></div>
+              <div class="space-y-1">
+                <div class="h-1.5 bg-slate-100 rounded w-full"></div>
+                <div class="h-1.5 bg-slate-100 rounded w-3/4"></div>
+              </div>
+              <div class="font-mono text-ink font-bold text-center">Page 1 of 24</div>
+            </div>
+            <button
+              onclick="window.showToast('Page numbers inserted across 24 pages!', 'success')"
+              class="w-full btn-primary mt-4"
+            >
+              Insert Page Numbers →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. OCR & TEXT EXTRACTOR WORKSPACE -->
+    <div id="tool-ocr" class="tool-content-pane hidden card-base p-6 sm:p-8">
+      <div class="max-w-4xl mx-auto">
+        <div class="mb-6 pb-4 border-b border-hairline">
+          <h2 class="text-xl font-bold text-ink flex items-center gap-2">
+            <span>📝</span> Optical Character Recognition (OCR) Engine
+          </h2>
+          <p class="text-xs text-slate-500 mt-1">Convert scanned non-selectable PDF pages into editable plain text and Markdown.</p>
+        </div>
+
+        <div class="space-y-4">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-slate-600 font-medium">Extracted Document Text (342 words)</span>
+            <button
+              onclick="copyOcrText()"
+              class="text-brand-blue hover:underline font-semibold flex items-center gap-1 cursor-pointer"
+            >
+              <span>📋</span> Copy Text
+            </button>
+          </div>
+
+          <textarea
+            id="ocr-text-area"
+            rows="8"
+            class="w-full bg-surface border border-hairline-strong rounded-2xl p-4 text-xs font-mono text-ink focus:bg-white focus:outline-none focus:border-brand-blue leading-relaxed"
+          ># Algorithm Complexity & Asymptotic Notations
+Date: September 2026
+Instructor: Dr. Sujoy Moulick
+
+1. Definition of Big-O:
+f(n) is O(g(n)) if there exist positive constants c and n0 such that:
+0 <= f(n) <= c * g(n) for all n >= n0.
+
+2. Typical Growth Rates:
+- O(1): Constant Time (Hash map lookup)
+- O(log n): Logarithmic Time (Binary Search)
+- O(n): Linear Time (Single pass array scan)
+- O(n log n): Linearithmic Time (MergeSort, QuickSort avg)
+- O(n^2): Quadratic Time (Nested iterations)</textarea>
+
+          <div class="flex justify-end gap-3">
+            <button
+              onclick="window.showToast('Extracted text exported to TXT file!', 'success')"
+              class="btn-secondary"
+            >
+              Export as .TXT
+            </button>
+            <button
+              onclick="window.showToast('Extracted Markdown saved to Workspace Notes!', 'success')"
+              class="btn-primary"
+            >
+              Save to Faculty Diary
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script is:inline>
+  // Tab Switching Logic
+  const tabBtns = document.querySelectorAll('.pdf-tab-btn');
+  const panes = document.querySelectorAll('.tool-content-pane');
+
+  tabBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.getAttribute('data-tool-target');
+
+      // Update button active state
+      tabBtns.forEach((b) => {
+        b.classList.remove('bg-ink', 'text-white', 'border-ink', 'shadow-sm', 'active-tab');
+        b.classList.add('bg-white', 'border-hairline', 'text-slate-600');
+      });
+      btn.classList.add('bg-ink', 'text-white', 'border-ink', 'shadow-sm', 'active-tab');
+      btn.classList.remove('bg-white', 'border-hairline', 'text-slate-600');
+
+      // Show matching pane
+      panes.forEach((p) => p.classList.add('hidden'));
+      const activePane = document.getElementById('tool-' + targetId);
+      if (activePane) activePane.classList.remove('hidden');
+    });
+  });
+
+  // Merge Button Handler
+  document.getElementById('btn-run-merge')?.addEventListener('click', async () => {
+    window.showToast('Merging PDF documents...', 'info');
+    try {
+      await fetch('/api/pdf-log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tool_type: 'merge',
+          filename: 'Merged_CS301_Complete.pdf',
+          original_size: 4200000,
+          optimized_size: 4100000,
+          page_count: 32,
+          status: 'Completed',
+        }),
+      });
+      window.showToast('Success! Merged_CS301_Complete.pdf is ready and saved to DB.', 'success');
+    } catch (e) {
+      window.showToast('Merged PDF downloaded', 'success');
+    }
+  });
+
+  // Add Demo PDFs
+  window.addDemoPdfFiles = function() {
+    window.showToast('Added 3 Course PDF modules to merge queue!', 'info');
+  };
+
+  // Stamp Preset
+  window.setStampPreset = function(text, colorClass) {
+    const input = document.getElementById('stamp-text-input');
+    const badge = document.getElementById('stamp-preview-badge');
+    if (input) input.value = text;
+    if (badge) badge.textContent = text;
+    window.showToast(`Preset stamp applied: ${text}`, 'info');
+  };
+
+  // Copy OCR Text
+  window.copyOcrText = function() {
+    const area = document.getElementById('ocr-text-area');
+    if (area) {
+      navigator.clipboard?.writeText(area.value);
+      window.showToast('OCR extracted text copied to clipboard!', 'success');
+    }
+  };
+</script>

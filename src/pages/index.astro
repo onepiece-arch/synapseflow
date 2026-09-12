@@ -1,0 +1,604 @@
+---
+import '../styles/global.css';
+import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/astro/components';
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SynapseFlow — AI-Powered Visual Cloud Suite for Documents, ATS & Academics</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class="bg-white text-ink min-h-screen selection:bg-brand-yellow/40 selection:text-ink">
+    <!-- Top Promo Banner (DESIGN.md promo-banner) -->
+    <div class="bg-ink text-white py-2.5 px-4 text-xs font-medium text-center flex items-center justify-center gap-3">
+      <span class="bg-brand-yellow text-ink text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">NEW 2.4</span>
+      <span>Experience the all-in-one productivity engine with unified document & academic workflows</span>
+      <a href="/dashboard" class="underline hover:text-brand-yellow font-semibold text-xs ml-1 hidden sm:inline">Get Started Free →</a>
+    </div>
+
+    <!-- Navigation Bar (DESIGN.md top-navigation) -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-hairline">
+      <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-brand-yellow flex items-center justify-center text-ink font-bold shadow-sm">
+            <svg class="w-5 h-5 text-ink" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-extrabold text-xl tracking-tight text-ink">SynapseFlow</span>
+            <span class="text-[10px] font-bold text-brand-yellow-dark bg-brand-yellow-light border border-brand-yellow/40 px-2 py-0.5 rounded-full">SaaS</span>
+          </div>
+        </a>
+
+        <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+          <a href="#suite" class="hover:text-ink transition-colors">Unified Suite</a>
+          <a href="#features" class="hover:text-ink transition-colors">Core Capabilities</a>
+          <a href="#playground" class="hover:text-ink transition-colors">Interactive Demo</a>
+          <a href="#pricing" class="hover:text-ink transition-colors">Pricing</a>
+          <a href="#faq" class="hover:text-ink transition-colors">FAQ</a>
+        </nav>
+
+        <div class="flex items-center gap-3">
+          <Show when="signed-out">
+            <a href="/sign-in" class="hidden sm:inline-flex text-xs font-semibold text-slate-700 hover:text-ink px-4 py-2 rounded-full hover:bg-surface transition-colors cursor-pointer">
+              Sign In
+            </a>
+            <a href="/sign-up" class="btn-primary cursor-pointer">
+              <span>Get Started Free</span>
+              <span class="ml-1.5">→</span>
+            </a>
+          </Show>
+          <Show when="signed-in">
+            <a href="/dashboard" class="text-xs font-semibold text-slate-700 hover:text-ink px-4 py-2 rounded-full hover:bg-surface transition-colors">
+              Launch Dashboard →
+            </a>
+            <UserButton />
+          </Show>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section (DESIGN.md hero-band-marketing) -->
+    <section class="relative pt-20 pb-20 px-6 text-center max-w-5xl mx-auto">
+      <!-- Tag Chip (DESIGN.md badge-tag-yellow) -->
+      <div class="inline-flex items-center gap-2 bg-brand-yellow-light border border-brand-yellow/40 rounded-full px-4 py-1.5 text-xs text-brand-yellow-dark font-semibold mb-8 shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-brand-yellow-deep animate-pulse"></span>
+        <span>SynapseFlow OS 2.4</span>
+        <span class="text-brand-yellow-dark/40">•</span>
+        <span class="text-ink font-medium">Four Essential Systems, One Single Canvas</span>
+      </div>
+
+      <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold text-ink tracking-tight leading-[1.08] mb-6">
+        The Visual Operating System for <br />
+        <span class="underline decoration-brand-yellow decoration-wavy decoration-2">Documents, ATS & Academics</span>
+      </h1>
+
+      <p class="text-lg sm:text-xl text-slate-600 max-w-3xl mx-auto mb-10 leading-relaxed font-normal">
+        Eliminate tool fragmentation. SynapseFlow unites high-performance <strong>PDF Manipulation</strong>, 
+        <strong>AI-powered ATS Resume Scoring</strong>, <strong>Campus Attendance Tracking</strong>, and <strong>Faculty Academic Diaries</strong> into a lightning-fast visual workspace.
+      </p>
+
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+        <a href="/dashboard" class="w-full sm:w-auto btn-primary text-sm px-8 py-3.5 shadow-mockup">
+          <span>Launch Unified Command Center</span>
+          <svg class="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </a>
+        <a href="#playground" class="w-full sm:w-auto btn-secondary text-sm px-8 py-3.5">
+          <span>Test Interactive Sandbox</span>
+          <span class="text-xs text-slate-400 font-mono ml-2">⌘K</span>
+        </a>
+      </div>
+
+      <!-- Quick Stats Bar (DESIGN.md card-stat) -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-white border border-hairline rounded-2xl max-w-4xl mx-auto shadow-card">
+        <div class="text-center p-2">
+          <div class="text-3xl sm:text-4xl font-extrabold text-ink">99.98%</div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Uptime SLA</div>
+        </div>
+        <div class="text-center p-2 border-l border-hairline">
+          <div class="text-3xl sm:text-4xl font-extrabold text-brand-blue">7-in-1</div>
+          <div class="text-xs text-slate-500 font-medium mt-1">PDF Engine Tools</div>
+        </div>
+        <div class="text-center p-2 border-l border-hairline">
+          <div class="text-3xl sm:text-4xl font-extrabold text-brand-teal">&lt;20ms</div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Client-side Latency</div>
+        </div>
+        <div class="text-center p-2 border-l border-hairline">
+          <div class="text-3xl sm:text-4xl font-extrabold text-brand-success">100%</div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Privacy Compliant</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 Core Pillars / Pastel Feature Cards Section (DESIGN.md card-feature variants) -->
+    <section id="suite" class="py-20 px-6 max-w-7xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest bg-surface border border-hairline px-3 py-1 rounded-full">
+          Four Dedicated Workspaces
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-ink mt-3">Engineered for Maximum Workflow Velocity</h2>
+        <p class="text-slate-600 text-sm mt-3">Every workspace is tailored for zero-friction productivity with instant client responsiveness.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Pillar 1: PDF Power Studio (Pastel Rose / Violet Card) -->
+        <div class="card-feature-rose p-8 transition-all hover:shadow-card group">
+          <div class="flex items-center justify-between mb-6">
+            <div class="w-12 h-12 rounded-2xl bg-white border border-brand-rose flex items-center justify-center text-2xl text-ink shadow-sm">
+              📄
+            </div>
+            <span class="text-xs font-semibold px-3 py-1 bg-white text-ink rounded-full border border-brand-rose shadow-sm">
+              Client Engine
+            </span>
+          </div>
+          <h3 class="text-2xl font-bold text-ink mb-2">PDF Power Studio</h3>
+          <p class="text-slate-700 text-sm mb-6 leading-relaxed">
+            Merge multiple PDFs, visual page-range split, lossy & lossless compression, custom watermark stamps, AI watermark remover, OCR extraction, and page formatting.
+          </p>
+          <div class="grid grid-cols-2 gap-2.5 text-xs text-slate-800 font-medium mb-6">
+            <div class="flex items-center gap-2"><span class="text-brand-blue font-bold">✓</span> Drag-and-drop batch merge</div>
+            <div class="flex items-center gap-2"><span class="text-brand-blue font-bold">✓</span> AI watermark cleaner</div>
+            <div class="flex items-center gap-2"><span class="text-brand-blue font-bold">✓</span> Smart size compressor</div>
+            <div class="flex items-center gap-2"><span class="text-brand-blue font-bold">✓</span> OCR text extraction</div>
+          </div>
+          <a href="/pdf-tools" class="inline-flex items-center gap-2 text-xs font-bold text-ink group-hover:underline">
+            Launch PDF Studio <span>→</span>
+          </a>
+        </div>
+
+        <!-- Pillar 2: ATS Resume Intelligence (Pastel Teal Card) -->
+        <div class="card-feature-teal p-8 transition-all hover:shadow-card group">
+          <div class="flex items-center justify-between mb-6">
+            <div class="w-12 h-12 rounded-2xl bg-white border border-brand-teal/30 flex items-center justify-center text-2xl text-ink shadow-sm">
+              🎯
+            </div>
+            <span class="text-xs font-semibold px-3 py-1 bg-white text-brand-moss-dark rounded-full border border-brand-teal/30 shadow-sm">
+              AI Algorithm
+            </span>
+          </div>
+          <h3 class="text-2xl font-bold text-ink mb-2">ATS Resume Intelligence</h3>
+          <p class="text-slate-700 text-sm mb-6 leading-relaxed">
+            Score your resume against applicant tracking systems and target job descriptions. Extract missing keywords, analyze action verbs, and generate custom AI prompts to optimize your CV.
+          </p>
+          <div class="grid grid-cols-2 gap-2.5 text-xs text-slate-800 font-medium mb-6">
+            <div class="flex items-center gap-2"><span class="text-brand-moss-dark font-bold">✓</span> Dynamic ATS Match Score (0-100)</div>
+            <div class="flex items-center gap-2"><span class="text-brand-moss-dark font-bold">✓</span> Missing keyword highlighter</div>
+            <div class="flex items-center gap-2"><span class="text-brand-moss-dark font-bold">✓</span> Action verb density meter</div>
+            <div class="flex items-center gap-2"><span class="text-brand-moss-dark font-bold">✓</span> ChatGPT / Claude prompt exporter</div>
+          </div>
+          <a href="/ats-checker" class="inline-flex items-center gap-2 text-xs font-bold text-ink group-hover:underline">
+            Launch ATS Engine <span>→</span>
+          </a>
+        </div>
+
+        <!-- Pillar 3: Campus Attendance System (Pastel Yellow Card) -->
+        <div class="card-feature-yellow p-8 transition-all hover:shadow-card group">
+          <div class="flex items-center justify-between mb-6">
+            <div class="w-12 h-12 rounded-2xl bg-white border border-brand-yellow/40 flex items-center justify-center text-2xl text-ink shadow-sm">
+              📋
+            </div>
+            <span class="text-xs font-semibold px-3 py-1 bg-white text-brand-yellow-dark rounded-full border border-brand-yellow/40 shadow-sm">
+              Real-Time Sync
+            </span>
+          </div>
+          <h3 class="text-2xl font-bold text-ink mb-2">Campus Attendance System</h3>
+          <p class="text-slate-700 text-sm mb-6 leading-relaxed">
+            Manage course rosters, mark student attendance in 1-click, execute batch updates, track low-attendance alerts (&lt;75%), and export automated CSV and PDF reports.
+          </p>
+          <div class="grid grid-cols-2 gap-2.5 text-xs text-slate-800 font-medium mb-6">
+            <div class="flex items-center gap-2"><span class="text-brand-yellow-dark font-bold">✓</span> Multi-subject roster manager</div>
+            <div class="flex items-center gap-2"><span class="text-brand-yellow-dark font-bold">✓</span> One-click batch mark & toggle</div>
+            <div class="flex items-center gap-2"><span class="text-brand-yellow-dark font-bold">✓</span> Live percentage recalculator</div>
+            <div class="flex items-center gap-2"><span class="text-brand-yellow-dark font-bold">✓</span> Automated CSV / Excel export</div>
+          </div>
+          <a href="/attendance" class="inline-flex items-center gap-2 text-xs font-bold text-ink group-hover:underline">
+            Launch Attendance Tracker <span>→</span>
+          </a>
+        </div>
+
+        <!-- Pillar 4: Faculty Academic Diary (Pastel Coral Card) -->
+        <div class="card-feature-coral p-8 transition-all hover:shadow-card group">
+          <div class="flex items-center justify-between mb-6">
+            <div class="w-12 h-12 rounded-2xl bg-white border border-brand-coral/40 flex items-center justify-center text-2xl text-ink shadow-sm">
+              📚
+            </div>
+            <span class="text-xs font-semibold px-3 py-1 bg-white text-brand-coral-dark rounded-full border border-brand-coral/40 shadow-sm">
+              Academic Suite
+            </span>
+          </div>
+          <h3 class="text-2xl font-bold text-ink mb-2">Faculty Academic Diary</h3>
+          <p class="text-slate-700 text-sm mb-6 leading-relaxed">
+            Centralize your teaching timetable, syllabus coverage checklists, student mentorship notes, course material repository, and research paper publication trackers.
+          </p>
+          <div class="grid grid-cols-2 gap-2.5 text-xs text-slate-800 font-medium mb-6">
+            <div class="flex items-center gap-2"><span class="text-brand-coral-dark font-bold">✓</span> Interactive weekly timetable</div>
+            <div class="flex items-center gap-2"><span class="text-brand-coral-dark font-bold">✓</span> Syllabus completion tracker</div>
+            <div class="flex items-center gap-2"><span class="text-brand-coral-dark font-bold">✓</span> Student mentorship remarks log</div>
+            <div class="flex items-center gap-2"><span class="text-brand-coral-dark font-bold">✓</span> Research publication monitor</div>
+          </div>
+          <a href="/faculty-diary" class="inline-flex items-center gap-2 text-xs font-bold text-ink group-hover:underline">
+            Launch Faculty Diary <span>→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Live Sandbox Playground (DESIGN.md whiteboard-mockup) -->
+    <section id="playground" class="py-20 px-6 max-w-6xl mx-auto">
+      <div class="bg-surface border border-hairline rounded-[28px] p-8 sm:p-12 shadow-mockup relative overflow-hidden">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-8 pb-6 border-b border-hairline">
+          <div>
+            <div class="flex items-center gap-2 text-xs font-bold text-brand-blue uppercase tracking-wider mb-1">
+              <span class="w-2 h-2 rounded-full bg-brand-blue animate-pulse"></span>
+              Live Interactive Sandbox
+            </div>
+            <h3 class="text-2xl font-bold text-ink">Experience the Unified Suite in Real-Time</h3>
+          </div>
+          <div class="flex gap-2">
+            <a href="/dashboard" class="btn-primary">
+              Open Full Dashboard →
+            </a>
+          </div>
+        </div>
+
+        <!-- Interactive Tabs Simulator -->
+        <div class="grid lg:grid-cols-3 gap-8">
+          <!-- Left Column: Quick Simulation Controls -->
+          <div class="space-y-4">
+            <div class="p-4 bg-white rounded-2xl border border-hairline space-y-3 shadow-card-subtle">
+              <div class="text-xs font-bold text-ink">Quick Test: ATS Scanner</div>
+              <div class="text-xs text-slate-600">Simulate scoring a resume against a Senior Full-Stack role:</div>
+              <button
+                id="demo-ats-btn"
+                class="w-full btn-blue py-2.5 rounded-full text-xs font-semibold cursor-pointer"
+              >
+                ⚡ Run Instant ATS Scan
+              </button>
+            </div>
+
+            <div class="p-4 bg-white rounded-2xl border border-hairline space-y-3 shadow-card-subtle">
+              <div class="text-xs font-bold text-ink">Quick Test: PDF Optimizer</div>
+              <div class="text-xs text-slate-600">Simulate compressing a 14.8 MB textbook:</div>
+              <button
+                id="demo-pdf-btn"
+                class="w-full btn-yellow py-2.5 rounded-full text-xs font-semibold cursor-pointer"
+              >
+                📦 Compress 14.8 MB PDF
+              </button>
+            </div>
+
+            <div class="p-4 bg-white rounded-2xl border border-hairline space-y-3 shadow-card-subtle">
+              <div class="text-xs font-bold text-ink">Quick Test: Attendance Tally</div>
+              <div class="text-xs text-slate-600">Simulate toggling class attendance for CS-301:</div>
+              <button
+                id="demo-att-btn"
+                class="w-full btn-primary py-2.5 rounded-full text-xs font-semibold cursor-pointer"
+              >
+                📋 Toggle Class Batch
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Column: Live Interactive Visualizer -->
+          <div class="lg:col-span-2 bg-white rounded-2xl border border-hairline p-6 flex flex-col justify-between shadow-card">
+            <div>
+              <div class="flex items-center justify-between pb-4 border-b border-hairline mb-4">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-rose-400"></span>
+                  <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+                  <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+                  <span class="text-xs font-mono text-slate-500 ml-2 font-medium">SynapseFlow Interactive Simulator</span>
+                </div>
+                <span id="demo-status-pill" class="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-brand-yellow-light text-brand-yellow-dark border border-brand-yellow/40 font-bold">
+                  Ready
+                </span>
+              </div>
+
+              <div id="demo-output-area" class="space-y-4 py-4 min-h-[220px]">
+                <div class="text-center py-10 text-slate-400">
+                  <div class="text-4xl mb-3">🚀</div>
+                  <p class="text-sm text-slate-700 font-semibold">Click any of the Quick Test buttons on the left</p>
+                  <p class="text-xs text-slate-500 mt-1">Watch real-time client state transformations in action</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-hairline flex items-center justify-between text-xs text-slate-500">
+              <span>Client latency: <strong class="text-brand-success font-semibold">0ms (Local ASTRO SPA)</strong></span>
+              <a href="/dashboard" class="text-brand-blue hover:underline font-semibold">Open Full App Sandbox →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Section (DESIGN.md pricing-card, pricing-card-featured, pricing-card-enterprise) -->
+    <section id="pricing" class="py-20 px-6 max-w-6xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest bg-surface border border-hairline px-3 py-1 rounded-full">
+          Transparent Pricing
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-ink mt-3">Simple, Predictable Plans</h2>
+        <p class="text-slate-600 text-sm mt-3">From individual faculty members to university-wide deployments.</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6 items-stretch">
+        <!-- 1. Free Starter (DESIGN.md pricing-card) -->
+        <div class="card-base p-8 flex flex-col justify-between">
+          <div>
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Starter Tier</div>
+            <div class="text-4xl font-extrabold text-ink mb-2">$0 <span class="text-xs font-normal text-slate-500">/ forever</span></div>
+            <p class="text-xs text-slate-600 mb-6">Essential tools for individual students and educators.</p>
+            <ul class="space-y-3 text-xs text-slate-700 font-medium mb-8">
+              <li class="flex items-center gap-2.5"><span class="text-brand-success font-bold">✓</span> 25 PDF operations/month</li>
+              <li class="flex items-center gap-2.5"><span class="text-brand-success font-bold">✓</span> 5 ATS Resume Scans</li>
+              <li class="flex items-center gap-2.5"><span class="text-brand-success font-bold">✓</span> 1 Classroom Attendance Roster</li>
+              <li class="flex items-center gap-2.5"><span class="text-brand-success font-bold">✓</span> Basic Faculty Diary Planner</li>
+            </ul>
+          </div>
+          <a href="/dashboard" class="btn-secondary w-full text-center">
+            Start Free
+          </a>
+        </div>
+
+        <!-- 2. Pro Individual (DESIGN.md pricing-card-featured: lavender background + 2px brand-blue border) -->
+        <div class="bg-surface-featured border-2 border-brand-blue rounded-2xl p-8 relative shadow-card flex flex-col justify-between">
+          <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-brand-blue text-white text-[10px] font-bold uppercase tracking-wider px-3 py-0.5 rounded-full shadow-sm">
+            Most Popular
+          </div>
+          <div>
+            <div class="text-xs font-bold text-brand-blue uppercase tracking-wider mb-2">Pro Educator</div>
+            <div class="text-4xl font-extrabold text-ink mb-2">$19 <span class="text-xs font-normal text-slate-500">/ month</span></div>
+            <p class="text-xs text-slate-600 mb-6">Full power for professors, lecturers, and active job seekers.</p>
+            <ul class="space-y-3 text-xs text-slate-700 font-medium mb-8">
+              <li class="flex items-center gap-2.5"><span class="text-brand-blue font-bold">✓</span> Unlimited PDF Processing & OCR</li>
+              <li class="flex items-center gap-2.5"><span class="text-brand-blue font-bold">✓</span> Unlimited ATS Scans + AI Prompt Gen</li>
+              <li class="flex items-center gap-2.5"><span class="text-brand-blue font-bold">✓</span> Up to 15 Course Rosters & CSV Export</li>
+              <li class="flex items-center gap-2.5"><span class="text-brand-blue font-bold">✓</span> Research Publication & Grant Tracker</li>
+              <li class="flex items-center gap-2.5"><span class="text-brand-blue font-bold">✓</span> Priority Cloud Vault (50 GB)</li>
+            </ul>
+          </div>
+          <a href="/dashboard" class="btn-blue w-full text-center">
+            Upgrade to Pro
+          </a>
+        </div>
+
+        <!-- 3. Campus Enterprise (DESIGN.md pricing-card-enterprise: dark-canvas) -->
+        <div class="bg-ink text-white rounded-2xl p-8 flex flex-col justify-between shadow-card">
+          <div>
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Campus Enterprise</div>
+            <div class="text-4xl font-extrabold text-white mb-2">$99 <span class="text-xs font-normal text-slate-400">/ department</span></div>
+            <p class="text-xs text-slate-300 mb-6">Institution-wide licensing with team roles & SSO.</p>
+            <ul class="space-y-3 text-xs text-slate-200 font-medium mb-8">
+              <li class="flex items-center gap-2.5"><span class="text-brand-yellow font-bold">✓</span> Unlimited Faculty & Student Seats</li>
+              <li class="flex items-center gap-2.5"><span class="text-brand-yellow font-bold">✓</span> Enterprise SIS & LMS Integration</li>
+              <li class="flex items-center gap-2.5"><span class="text-brand-yellow font-bold">✓</span> Department Attendance Audits</li>
+              <li class="flex items-center gap-2.5"><span class="text-brand-yellow font-bold">✓</span> Dedicated Account Manager</li>
+            </ul>
+          </div>
+          <a href="/dashboard" class="w-full text-center py-2.5 rounded-full bg-white text-ink font-medium text-xs hover:bg-surface transition-colors">
+            Contact Enterprise
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section (DESIGN.md faq-accordion-item) -->
+    <section id="faq" class="py-20 px-6 max-w-4xl mx-auto">
+      <div class="text-center mb-12">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest bg-surface border border-hairline px-3 py-1 rounded-full">
+          FAQ
+        </span>
+        <h2 class="text-3xl font-extrabold text-ink mt-3">Frequently Asked Questions</h2>
+      </div>
+
+      <div class="space-y-3">
+        <details class="card-base p-5 group cursor-pointer">
+          <summary class="font-bold text-sm text-ink flex justify-between items-center list-none">
+            <span>What makes SynapseFlow different from standard standalone tools?</span>
+            <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="text-xs text-slate-600 mt-3 leading-relaxed">
+            SynapseFlow eliminates app switching. You can process course syllabus PDFs, grade student attendance, log mentorship remarks, and run career ATS resume optimization all within a single unified, ultra-fast interface.
+          </p>
+        </details>
+
+        <details class="card-base p-5 group cursor-pointer">
+          <summary class="font-bold text-sm text-ink flex justify-between items-center list-none">
+            <span>Are PDF files and Resumes uploaded securely?</span>
+            <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="text-xs text-slate-600 mt-3 leading-relaxed">
+            Yes! All PDF modifications (merge, split, page numbers, compression) run high-speed client-side algorithms directly in your browser without sensitive student documents ever touching untrusted third-party servers.
+          </p>
+        </details>
+
+        <details class="card-base p-5 group cursor-pointer">
+          <summary class="font-bold text-sm text-ink flex justify-between items-center list-none">
+            <span>Can I export attendance logs to Excel or CSV?</span>
+            <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="text-xs text-slate-600 mt-3 leading-relaxed">
+            Yes, the Campus Attendance manager supports 1-click downloads in CSV format, ready to import directly into institutional LMS systems like Canvas, Moodle, or Google Classroom.
+          </p>
+        </details>
+      </div>
+    </section>
+
+    <!-- Footer (DESIGN.md footer-region) -->
+    <footer class="bg-ink text-white py-16 px-6">
+      <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-8 pb-12 border-b border-charcoal">
+          <div class="col-span-2 space-y-4">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-xl bg-brand-yellow flex items-center justify-center text-ink font-bold text-xs">
+                SF
+              </div>
+              <span class="font-extrabold text-base text-white">SynapseFlow Cloud OS</span>
+            </div>
+            <p class="text-xs text-slate-400 max-w-sm leading-relaxed">
+              The AI-powered productivity platform bringing together PDF studio tools, ATS optimization, attendance management, and faculty diaries.
+            </p>
+          </div>
+
+          <div>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Product</h4>
+            <div class="space-y-2 text-xs text-slate-300">
+              <p><a href="/dashboard" class="hover:text-white">Command Center</a></p>
+              <p><a href="/pdf-tools" class="hover:text-white">PDF Studio</a></p>
+              <p><a href="/ats-checker" class="hover:text-white">ATS AI Engine</a></p>
+              <p><a href="/attendance" class="hover:text-white">Attendance Manager</a></p>
+            </div>
+          </div>
+
+          <div>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Academic</h4>
+            <div class="space-y-2 text-xs text-slate-300">
+              <p><a href="/faculty-diary" class="hover:text-white">Faculty Diary</a></p>
+              <p><a href="/analytics" class="hover:text-white">Analytics</a></p>
+              <p><a href="/settings" class="hover:text-white">Settings</a></p>
+            </div>
+          </div>
+
+          <div>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Company</h4>
+            <div class="space-y-2 text-xs text-slate-300">
+              <p><a href="#" class="hover:text-white">About Us</a></p>
+              <p><a href="#" class="hover:text-white">Privacy Policy</a></p>
+              <p><a href="#" class="hover:text-white">Terms of Service</a></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
+          <p>© 2026 SynapseFlow Systems Inc. All rights reserved.</p>
+          <div class="flex items-center gap-6">
+            <span>Status: All Systems Operational</span>
+            <span class="text-slate-600">•</span>
+            <span>Security: SOC2 / GDPR Compliant</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script is:inline>
+      // Interactive Landing Page Simulator Logic
+      const outputArea = document.getElementById('demo-output-area');
+      const statusPill = document.getElementById('demo-status-pill');
+
+      document.getElementById('demo-ats-btn')?.addEventListener('click', () => {
+        if (!outputArea) return;
+        statusPill.textContent = 'Analyzing...';
+        statusPill.className = 'text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-brand-blue-light text-brand-blue border border-brand-blue/30 font-bold animate-pulse';
+        outputArea.innerHTML = `
+          <div class="animate-fadeIn space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-700">Target Role: Senior Full-Stack Engineer</span>
+              <span class="text-xs font-bold text-brand-blue bg-brand-blue-light px-2.5 py-1 rounded-full border border-brand-blue/30">ATS Score: 88 / 100</span>
+            </div>
+            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+              <div class="bg-brand-blue h-full w-[88%] transition-all duration-700 rounded-full"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="p-3 bg-surface rounded-xl border border-hairline">
+                <span class="text-emerald-700 font-semibold block mb-1">✓ Matched Keywords</span>
+                <div class="flex flex-wrap gap-1">
+                  <span class="px-2 py-0.5 bg-emerald-50 text-emerald-800 rounded-full text-[10px] font-semibold border border-emerald-200">React</span>
+                  <span class="px-2 py-0.5 bg-emerald-50 text-emerald-800 rounded-full text-[10px] font-semibold border border-emerald-200">TypeScript</span>
+                  <span class="px-2 py-0.5 bg-emerald-50 text-emerald-800 rounded-full text-[10px] font-semibold border border-emerald-200">Node.js</span>
+                  <span class="px-2 py-0.5 bg-emerald-50 text-emerald-800 rounded-full text-[10px] font-semibold border border-emerald-200">GraphQL</span>
+                </div>
+              </div>
+              <div class="p-3 bg-surface rounded-xl border border-hairline">
+                <span class="text-rose-700 font-semibold block mb-1">⚠ Missing Keywords</span>
+                <div class="flex flex-wrap gap-1">
+                  <span class="px-2 py-0.5 bg-rose-50 text-rose-800 rounded-full text-[10px] font-semibold border border-rose-200">Docker / K8s</span>
+                  <span class="px-2 py-0.5 bg-rose-50 text-rose-800 rounded-full text-[10px] font-semibold border border-rose-200">CI/CD Pipeline</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        setTimeout(() => {
+          statusPill.textContent = 'Scan Complete';
+          statusPill.className = 'text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold';
+        }, 300);
+      });
+
+      document.getElementById('demo-pdf-btn')?.addEventListener('click', () => {
+        if (!outputArea) return;
+        statusPill.textContent = 'Compressing...';
+        statusPill.className = 'text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-brand-yellow-light text-brand-yellow-dark border border-brand-yellow/40 font-bold animate-pulse';
+        outputArea.innerHTML = `
+          <div class="animate-fadeIn space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-700">File: Operating_Systems_Textbook.pdf</span>
+              <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">-85% Reduction</span>
+            </div>
+            <div class="flex items-center justify-between text-xs bg-surface p-3.5 rounded-xl border border-hairline">
+              <div>
+                <span class="text-slate-500 block text-[10px]">ORIGINAL SIZE</span>
+                <span class="text-rose-600 font-bold font-mono">14.80 MB</span>
+              </div>
+              <span class="text-slate-400 text-lg">➔</span>
+              <div>
+                <span class="text-slate-500 block text-[10px]">OPTIMIZED SIZE</span>
+                <span class="text-emerald-600 font-bold font-mono">2.21 MB</span>
+              </div>
+            </div>
+            <div class="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-center justify-between">
+              <span>✓ Quality Preserved (300 DPI Vector Text)</span>
+              <span class="font-bold underline cursor-pointer">Simulated Download</span>
+            </div>
+          </div>
+        `;
+        setTimeout(() => {
+          statusPill.textContent = 'Optimized';
+          statusPill.className = 'text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold';
+        }, 300);
+      });
+
+      document.getElementById('demo-att-btn')?.addEventListener('click', () => {
+        if (!outputArea) return;
+        statusPill.textContent = 'Updating Roster...';
+        statusPill.className = 'text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-brand-yellow-light text-brand-yellow-dark border border-brand-yellow/40 font-bold animate-pulse';
+        outputArea.innerHTML = `
+          <div class="animate-fadeIn space-y-2">
+            <div class="flex items-center justify-between text-xs pb-1">
+              <span class="font-bold text-slate-800">CS-301: Data Structures & Algorithms</span>
+              <span class="text-emerald-700 font-mono font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">93.3% Rate</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-center text-xs">
+              <div class="p-2.5 bg-surface rounded-xl border border-hairline">
+                <span class="text-slate-500 text-[10px] block font-medium">TOTAL</span>
+                <span class="font-bold text-ink text-base">45</span>
+              </div>
+              <div class="p-2.5 bg-emerald-50 rounded-xl border border-emerald-200">
+                <span class="text-emerald-700 text-[10px] block font-medium">PRESENT</span>
+                <span class="font-bold text-emerald-700 text-base">42</span>
+              </div>
+              <div class="p-2.5 bg-rose-50 rounded-xl border border-rose-200">
+                <span class="text-rose-700 text-[10px] block font-medium">ABSENT</span>
+                <span class="font-bold text-rose-700 text-base">3</span>
+              </div>
+            </div>
+            <div class="p-2.5 bg-surface rounded-xl border border-hairline flex items-center justify-between text-xs">
+              <span class="text-slate-700 font-medium">Today's Class Ledger Synced</span>
+              <span class="text-[10px] text-brand-blue font-mono font-bold">Sync ID #ATT-8902</span>
+            </div>
+          </div>
+        `;
+        setTimeout(() => {
+          statusPill.textContent = 'Class Synced';
+          statusPill.className = 'text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold';
+        }, 300);
+      });
+    </script>
+  </body>
+</html>
